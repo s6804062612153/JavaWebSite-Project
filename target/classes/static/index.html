@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="QuizApp — เว็บแบบทดสอบ Anime, Gaming และความรู้ทั่วไป พร้อมเฉลยและคำอธิบาย">
+    <meta name="application-version" content="1.2.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>QuizApp | Knowledge Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="site-frame">
+    <header class="navbar">
+        <a class="brand" href="#setupView" aria-label="QuizApp home">
+            <span class="brand-logo">Q</span>
+            <span class="brand-copy">
+                <strong>QuizApp</strong>
+                <small>Knowledge Quiz</small>
+            </span>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="#setupView" data-view-link="setupView">Home</a>
+            <a href="#quizView" data-view-link="quizView">Quiz</a>
+            <a href="#resultView" data-view-link="resultView">Results</a>
+        </nav>
+        <button id="themeToggle" class="icon-button" type="button" aria-label="เปลี่ยนธีม" title="เปลี่ยนธีม">
+            <span id="themeIcon">☾</span>
+        </button>
+    </header>
+
+    <main>
+        <section id="setupView" class="view active" aria-labelledby="setupTitle">
+            <div class="content-container">
+                <div class="page-heading">
+                    <div>
+                        <p class="section-kicker">QUIZAPP / HOME</p>
+                        <h1 id="setupTitle">Test your <span>knowledge.</span></h1>
+                        <p class="page-description">
+                            เลือกโจทย์ในแบบที่ต้องการ แล้วเริ่มทำแบบทดสอบได้ทันที
+                            โดยรูปแบบการทำข้อสอบและการให้คะแนนยังคงเหมือนเดิม
+                        </p>
+                    </div>
+                    <div class="heading-note">
+                        <span class="status-indicator" id="apiStatusDot"></span>
+                        <span id="apiStatusText">กำลังตรวจสอบ API...</span>
+                    </div>
+                </div>
+
+                <div id="resumeBanner" class="resume-banner" hidden>
+                    <span id="resumeText"></span>
+                    <span class="resume-actions">
+                        <button id="resumeButton" class="button button-primary" type="button">ทำต่อ →</button>
+                        <button id="discardButton" class="button button-outline" type="button">ทิ้งแบบทดสอบ</button>
+                    </span>
+                </div>
+
+                <div class="setup-layout">
+                    <section class="card setup-card">
+                        <div class="card-header">
+                            <div>
+                                <h2>Quiz setup</h2>
+                                <p>กำหนดเงื่อนไขก่อนเริ่มทำข้อสอบ</p>
+                            </div>
+                            <span class="card-number">01</span>
+                        </div>
+
+                        <form id="quizForm" class="form-grid">
+                            <label class="field">
+                                <span class="field-label">ประเภทคำถาม</span>
+                                <select id="category" name="category">
+                                    <option value="ALL">ทุกหมวดหมู่</option>
+                                    <option value="ANIME_GAMING">Anime & Gaming</option>
+                                    <option value="GENERAL">General Knowledge</option>
+                                </select>
+                            </label>
+
+                            <label class="field">
+                                <span class="field-label">ระดับความยาก</span>
+                                <select id="difficulty" name="difficulty">
+                                    <option value="ALL">ทุกระดับ</option>
+                                    <option value="EASY">Easy</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="HARD">Hard</option>
+                                </select>
+                            </label>
+
+                            <div class="field field-full" role="group" aria-labelledby="limitLabel">
+                                <span class="field-row">
+                                    <span id="limitLabel" class="field-label">จำนวนข้อ</span>
+                                    <span id="availableHint" class="field-hint">กำลังโหลดจำนวนข้อ...</span>
+                                </span>
+
+                                <div id="limitPresets" class="preset-group" role="radiogroup" aria-label="จำนวนข้อแบบเลือกเร็ว"></div>
+
+                                <div class="stepper">
+                                    <button id="limitMinus" class="stepper-button" type="button" aria-label="ลดจำนวนข้อ">−</button>
+                                    <input id="limit" name="limit" type="number" inputmode="numeric" min="1" max="20" value="10" step="1" aria-label="จำนวนข้อ">
+                                    <button id="limitPlus" class="stepper-button" type="button" aria-label="เพิ่มจำนวนข้อ">+</button>
+                                    <input id="limitRange" type="range" min="1" max="20" value="10" step="1" aria-label="เลื่อนเพื่อเลือกจำนวนข้อ">
+                                </div>
+                                <span class="range-caption"><span>1</span><span id="limitMaxLabel">20 questions</span></span>
+                            </div>
+
+                            <button id="startButton" class="button button-primary field-full" type="submit">
+                                <span>เริ่มทำแบบทดสอบ</span><span class="button-arrow">→</span>
+                            </button>
+                        </form>
+                        <p id="setupError" class="error-message" role="alert"></p>
+                    </section>
+
+                    <aside class="intro-card">
+                        <div class="intro-icon">✦</div>
+                        <p class="section-kicker">HOW IT WORKS</p>
+                        <h2>เรียบง่าย แต่พร้อมต่อยอด</h2>
+                        <p>
+                            หน้าแรกออกแบบให้เป็นศูนย์กลางสำหรับเลือกประเภทโจทย์
+                            ส่วนการทำข้อสอบและผลลัพธ์จะแยกเป็นขั้นตอนชัดเจน
+                        </p>
+                        <div class="mini-list">
+                            <div><span>01</span><strong>Choose</strong><small>เลือกหมวดและความยาก</small></div>
+                            <div><span>02</span><strong>Answer</strong><small>ตอบคำถามทีละข้อ</small></div>
+                            <div><span>03</span><strong>Review</strong><small>ดูคะแนนและเฉลย</small></div>
+                        </div>
+                    </aside>
+                </div>
+
+                <div class="info-grid">
+                    <article class="info-card">
+                        <span class="info-value">20</span>
+                        <span class="info-label">QUESTIONS IN BANK</span>
+                    </article>
+                    <article class="info-card">
+                        <span class="info-value">2</span>
+                        <span class="info-label">CATEGORIES</span>
+                    </article>
+                    <article class="info-card">
+                        <span class="info-value">3</span>
+                        <span class="info-label">DIFFICULTY LEVELS</span>
+                    </article>
+                    <article class="info-card">
+                        <span class="info-value">100–200</span>
+                        <span class="info-label">POINTS / QUESTION</span>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="quizView" class="view" aria-labelledby="quizTitle">
+            <div class="content-container">
+                <div class="quiz-toolbar">
+                    <button id="backToSetup" class="button button-outline" type="button">← ตั้งค่าใหม่</button>
+                    <div class="progress-section">
+                        <div class="progress-meta">
+                            <span id="questionCounter">ข้อ 1 / 10</span>
+                            <span id="answeredCounter">ตอบแล้ว 0</span>
+                        </div>
+                        <div class="progress-track" aria-hidden="true">
+                            <div id="progressBar" class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="card question-card">
+                    <nav id="questionNav" class="question-nav" aria-label="เลือกข้อ"></nav>
+                    <div class="question-header">
+                        <div>
+                            <p class="section-kicker">QUESTION <span id="questionNumberBadge">01</span></p>
+                            <div class="badge-group">
+                                <span id="questionCategory" class="badge badge-primary">CATEGORY</span>
+                                <span id="questionDifficulty" class="badge">EASY</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 id="quizTitle" class="question-title">คำถามข้อที่ 1</h2>
+                    <p id="questionText" class="question-text"></p>
+                    <div id="options" class="options-list" role="radiogroup" aria-labelledby="quizTitle"></div>
+                    <p id="quizError" class="error-message" role="alert"></p>
+
+                    <div class="question-actions">
+                        <button id="prevButton" class="button button-outline" type="button">← ก่อนหน้า</button>
+                        <button id="nextButton" class="button button-primary" type="button">ถัดไป →</button>
+                        <button id="submitButton" class="button button-primary button-success" type="button">ส่งคำตอบ ✓</button>
+                    </div>
+                    <p class="keyboard-hint">Tip: กด 1–4 เพื่อเลือกคำตอบ และใช้ ← / → เพื่อเปลี่ยนข้อ</p>
+                </section>
+            </div>
+        </section>
+
+        <section id="resultView" class="view" aria-labelledby="resultTitle">
+            <div class="content-container">
+                <div class="page-heading result-heading">
+                    <div>
+                        <p class="section-kicker">QUIZ / RESULT</p>
+                        <h1 id="resultTitle">Your result.</h1>
+                        <p id="resultMessage" class="page-description"></p>
+                    </div>
+                    <div id="gradeBadge" class="grade-badge" aria-label="เกรด">S</div>
+                </div>
+
+                <section class="card result-visual" aria-label="สรุปผลแบบกราฟ">
+                    <div class="score-ring" role="img" aria-label="Accuracy">
+                        <svg viewBox="0 0 120 120" aria-hidden="true">
+                            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+                            <circle id="scoreRingValue" class="ring-value" cx="60" cy="60" r="52"></circle>
+                        </svg>
+                        <strong id="scoreRingText">0%</strong>
+                    </div>
+                    <div class="strip-wrap">
+                        <p class="section-kicker">ANSWER MAP</p>
+                        <div id="resultStrip" class="result-strip"></div>
+                        <p class="strip-legend">
+                            <span class="legend correct">ถูก</span>
+                            <span class="legend incorrect">ผิด</span>
+                            <span class="legend skipped">ไม่ได้ตอบ</span>
+                            · กดตัวเลขเพื่อข้ามไปดูเฉลยข้อนั้น
+                        </p>
+                    </div>
+                </section>
+
+                <div class="result-stats">
+                    <article class="result-stat card">
+                        <span>คะแนนรวม</span>
+                        <strong id="scoreValue">0</strong>
+                    </article>
+                    <article class="result-stat card">
+                        <span>ตอบถูก</span>
+                        <strong id="correctValue">0/0</strong>
+                    </article>
+                    <article class="result-stat card">
+                        <span>Accuracy</span>
+                        <strong id="accuracyValue">0%</strong>
+                    </article>
+                </div>
+
+                <section class="card review-card">
+                    <div class="card-header">
+                        <div>
+                            <h2>Review answers</h2>
+                            <p>ดูเฉลย ตัวเลือกที่ตอบ และคำอธิบายของแต่ละข้อ</p>
+                        </div>
+                        <button id="retryButton" class="button button-primary" type="button">ทำอีกครั้ง</button>
+                    </div>
+                    <div id="reviewList" class="review-list"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div>
+            <strong>QuizApp</strong>
+            <span>Spring Boot + HTML + CSS + JavaScript</span>
+        </div>
+        <span>v1.2.0 · Built for learning & extension</span>
+    </footer>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-card">
+        <div class="loader"></div>
+        <strong>กำลังประมวลผล...</strong>
+        <span>กรุณารอสักครู่</span>
+    </div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
