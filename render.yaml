@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: quizapp
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/quiz/health
+    autoDeploy: true
