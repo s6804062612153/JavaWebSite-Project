@@ -41,9 +41,10 @@ public class QuizApiController {
             @RequestParam(defaultValue = "ALL") String category,
             @RequestParam(defaultValue = "ALL") String difficulty) {
 
+        int available = quizService.countQuestions(category, difficulty);
         return ResponseEntity.ok(Map.of(
-                "available", quizService.countQuestions(category, difficulty),
-                "maxLimit", quizService.maxLimitFor(category, difficulty)
+                "available", available,
+                "maxLimit", available
         ));
     }
 

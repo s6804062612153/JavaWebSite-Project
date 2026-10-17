@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f8fc">
+    <meta name="description" content="QuizApp question bank administration dashboard">
+    <title>ฐานข้อมูลคำถาม | QuizApp</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <script src="/js/admin.js?v=1.3.2" defer></script>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="/" aria-label="กลับสู่ QuizApp">
+        <span class="brand-mark">Q</span>
+        <span><strong>QuizApp</strong><small>QUESTION BANK / DATABASE</small></span>
+    </a>
+    <div class="top-actions">
+        <span class="readonly-pill"><span></span> Read-only dashboard</span>
+        <a class="link-button" href="/">กลับไปหน้าแบบทดสอบ ↗</a>
+    </div>
+</header>
+
+<main class="container">
+    <section id="dashboard">
+        <div class="page-heading">
+            <div>
+                <p class="eyebrow">OVERVIEW / DATABASE</p>
+                <h1>คลังคำถาม <span>ทั้งหมด</span></h1>
+                <p class="muted">ข้อมูลสดจากฐานข้อมูล เรียงตาม ID และค้นหาได้โดยไม่เปลี่ยนข้อมูลข้อสอบ · โหมดอ่านอย่างเดียว</p>
+            </div>
+            <button id="refreshButton" class="button button-secondary" type="button">↻ รีเฟรชข้อมูล</button>
+        </div>
+
+        <div id="summaryCards" class="summary-grid" aria-live="polite"></div>
+
+        <section class="panel distribution-panel">
+            <div class="panel-heading">
+                <div><p class="eyebrow">QUESTION DISTRIBUTION</p><h2>สรุปตามหมวดหมู่และความยาก</h2></div>
+                <span class="panel-caption">จำนวนข้อ</span>
+            </div>
+            <div id="distributionTable" class="table-wrap"></div>
+        </section>
+
+        <section class="panel question-panel">
+            <div class="panel-heading question-heading">
+                <div><p class="eyebrow">QUESTION CATALOG</p><h2>รายการคำถาม</h2><p id="resultMeta" class="muted">กำลังโหลดรายการ...</p></div>
+            </div>
+            <form id="filterForm" class="filters">
+                <label class="filter-field search-field"><span>ค้นหาข้อความ</span><input id="keywordFilter" type="search" maxlength="120" placeholder="พิมพ์คำถามที่ต้องการค้นหา"></label>
+                <label class="filter-field"><span>หมวดหมู่</span><select id="categoryFilter"><option value="ALL">ทุกหมวดหมู่</option><option value="ANIME_GAMING">Anime &amp; Gaming</option><option value="GENERAL">General Knowledge</option></select></label>
+                <label class="filter-field"><span>ระดับความยาก</span><select id="difficultyFilter"><option value="ALL">ทุกระดับ</option><option value="EASY">ง่าย · Easy</option><option value="MEDIUM">ปานกลาง · Medium</option><option value="HARD">ยาก · Hard</option></select></label>
+                <label class="filter-field page-size-field"><span>แสดงต่อหน้า</span><select id="pageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></label>
+                <div class="filter-actions"><button class="button button-primary" type="submit">ค้นหา</button><button id="resetFilters" class="button button-secondary" type="button">ล้างตัวกรอง</button></div>
+            </form>
+            <div id="questionList" class="question-list" aria-live="polite"></div>
+            <div class="pagination">
+                <span id="pageInfo" class="muted">หน้า 1</span>
+                <div class="pagination-actions"><button id="prevPage" class="button button-secondary" type="button" disabled>← ก่อนหน้า</button><button id="nextPage" class="button button-secondary" type="button" disabled>ถัดไป →</button></div>
+            </div>
+        </section>
+        <p id="dashboardMessage" class="message" role="status" aria-live="polite"></p>
+    </section>
+</main>
+<footer class="footer"><span>QuizApp Admin</span><span>ฐานข้อมูลคำถาม · Read-only</span></footer>
+</body>
+</html>

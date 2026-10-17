@@ -1,4 +1,4 @@
-/* QuizApp frontend — v1.2.0
+/* QuizApp frontend — v1.3.2
  * Vanilla JS, no build step. Talks to the Spring Boot REST API (same origin).
  */
 const VIEWS = ['setupView', 'quizView', 'resultView'];
@@ -60,6 +60,19 @@ function setLoading(loading) {
 function setApiStatus(type, text) {
     byId('apiStatusDot').className = `status-indicator ${type}`;
     byId('apiStatusText').textContent = text;
+}
+
+async function refreshBankStats() {
+    const target = byId('bankQuestionCount');
+    if (!target) return;
+    try {
+        const response = await fetch('/api/quiz/count?category=ALL&difficulty=ALL', { cache: 'no-store' });
+        if (!response.ok) throw new Error('count unavailable');
+        const data = await response.json();
+        target.textContent = Number(data.available).toLocaleString('th-TH');
+    } catch {
+        target.textContent = '—';
+    }
 }
 
 async function checkApi() {
@@ -128,9 +141,8 @@ function renderResumeBanner() {
 
 /* ---------- Question count picker ---------- */
 
-const HARD_MAX_LIMIT = 20;
-const PRESET_VALUES = [5, 10, 15, 20];
-const limitInfo = { max: HARD_MAX_LIMIT, available: null, ready: false };
+const PRESET_VALUES = [5, 10, 15, 20, 30, 40, 50, 60, 75, 100];
+const limitInfo = { max: 0, available: null, ready: false };
 let hintTimer = null;
 let countRequestId = 0;
 
@@ -153,11 +165,10 @@ function setLimit(value) {
 
 function renderPresets() {
     const values = PRESET_VALUES.filter((value) => value < limitInfo.max);
-    if (limitInfo.max > 0) values.push(limitInfo.max);   // last chip = "all available"
+    if (limitInfo.max > 0) values.push(limitInfo.max);   // เพิ่มปุ่มจำนวนสูงสุดที่มีจริง
     const unique = [...new Set(values)];
-
     byId('limitPresets').innerHTML = unique.map((value) => {
-        const isAll = value === limitInfo.max && !PRESET_VALUES.includes(value);
+        const isAll = value === limitInfo.max;
         const label = isAll ? `ทั้งหมด (${value})` : String(value);
         return `<button type="button" class="preset" role="radio" aria-checked="false" data-value="${value}">${label}</button>`;
     }).join('');
@@ -202,8 +213,10 @@ async function refreshAvailableCount() {
         if (!response.ok) throw new Error('count unavailable');
         const data = await response.json();
         if (requestId !== countRequestId) return;   // a newer request superseded this one
-        limitInfo.available = Number(data.available);
-        limitInfo.max = Math.max(0, Math.min(Number(data.maxLimit), HARD_MAX_LIMIT));
+        const available = Number(data.available);
+        const maxLimit = Number(data.maxLimit);
+        limitInfo.available = Number.isFinite(available) ? Math.max(0, available) : 0;
+        limitInfo.max = Number.isFinite(maxLimit) ? Math.max(0, maxLimit) : 0;
         limitInfo.ready = true;
     } catch {
         if (requestId !== countRequestId) return;
@@ -561,6 +574,7 @@ setLoading(false);
 renderPresets();
 setLimit(10);
 refreshAvailableCount();
+refreshBankStats();
 applyTheme(preferredTheme());
 if (loadSession()) renderQuestion();
 renderResumeBanner();

@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class QuizApplication {
 
-    public static final String APP_VERSION = "1.2.0";
+    public static final String APP_VERSION = "1.3.2";
 
     public static void main(String[] args) {
         SpringApplication.run(QuizApplication.class, args);
